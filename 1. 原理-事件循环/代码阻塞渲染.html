@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>代码阻塞渲染</title>
+  </head>
+  <body>
+    <h1>Mr.Yu is awesome!</h1>
+    <button>change</button>
+    <script>
+      var h1 = document.querySelector("h1");
+      var btn = document.querySelector("button");
+
+      function delay(duration) {
+        var start = new Date();
+        while (new Date() - start < duration) {}
+      }
+
+      btn.addEventListener("click", function () {
+        h1.textContent = "于老师很帅！";
+        delay(3000);
+      });
+    </script>
+  </body>
+</html>

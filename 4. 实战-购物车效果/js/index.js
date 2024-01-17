@@ -28,10 +28,10 @@ class UIGoods {
 class UIData {
   constructor() {
     let uiGoods = [];
-    for (let i = 0; i < goods.length; i++) {
-      let uig = new UIGoods(goods[i]);
+    goods.forEach((good) => {
+      let uig = new UIGoods(good);
       uiGoods.push(uig);
-    }
+    });
     this.uiGoods = uiGoods;
     // 起送费
     this.deliveryThreshold = 30;
@@ -41,10 +41,10 @@ class UIData {
   // 所有商品总价
   getTotalPrice() {
     let sum = 0;
-    for (let i = 0; i < this.uiGoods.length; i++) {
-      let g = this.uiGoods[i];
+    this.uiGoods.forEach((uiGood) => {
+      let g = uiGood;
       sum += g.getTotalPrice();
-    }
+    });
     return sum;
   }
   // 增加某件商品选中数量
@@ -57,11 +57,9 @@ class UIData {
   }
   // 得到总共的选择数量
   getTotalChooseNumber() {
-    let sum = 0;
-    for (let i = 0; i < this.uiGoods.length; i++) {
-      sum += this.uiGoods[i].choose;
-    }
-    return sum;
+    return this.uiGoods
+      .map((item) => item.choose)
+      .reduce((prev, cur) => prev + cur);
   }
   // 购物称重有没有东西
   hasGoodsInCar() {
@@ -102,15 +100,14 @@ class UI {
 
   // 监听事件
   listenEvent() {
-    this.doms.car.addEventListener("animationend", function () {
-      this.classList.remove("animate");
+    this.doms.car.addEventListener("animationend", () => {
+      this.doms.car.classList.remove("animate");
     });
   }
   // 根据商品数据创建商品列表元素
   createHTML() {
     let html = "";
-    for (let i = 0; i < this.uiData.uiGoods.length; i++) {
-      let g = this.uiData.uiGoods[i];
+    this.uiData.uiGoods.forEach((g, i) => {
       html += `<div class="goods-item">
         <img src=${g.data.pic} alt="" class="goods-pic" />
         <div class="goods-info">
@@ -127,14 +124,14 @@ class UI {
               <span>${g.data.price}</span>
             </p>
             <div class="goods-btns">
-              <i index=${i} class="iconfont i-jianhao"></i>
+              <i data-index=${i} class="iconfont i-jianhao"></i>
               <span>${g.choose}</span>
-              <i index=${i} class="iconfont i-jiajianzujianjiahao"></i>
+              <i data-index=${i} class="iconfont i-jiajianzujianjiahao"></i>
             </div>
           </div>
         </div>
       </div>`;
-    }
+    });
     this.doms.goodsContainer.innerHTML = html;
   }
 
@@ -221,12 +218,11 @@ class UI {
     // 设置结束位置
     div.style.transform = `translateX(${this.jumpTarget.x}px)`;
     i.style.transform = `translateY(${this.jumpTarget.y}px)`;
-    let that = this;
     div.addEventListener(
       "transitionend",
-      function () {
-        this.remove();
-        that.carAnimate();
+      () => {
+        div.remove();
+        this.carAnimate();
       },
       {
         once: true,
@@ -238,11 +234,10 @@ class UI {
 let ui = new UI();
 
 ui.doms.goodsContainer.addEventListener("click", function (e) {
+  let index = +e.target.dataset.index;
   if (e.target.classList.contains("i-jiajianzujianjiahao")) {
-    let index = +e.target.getAttribute("index");
     ui.increase(index);
   } else if (e.target.classList.contains("i-jianhao")) {
-    let index = +e.target.getAttribute("index");
     ui.decrease(index);
   }
 });
